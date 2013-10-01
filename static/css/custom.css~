@@ -1,6 +1,0 @@
-
-
-.blog-post .title {
-    text-weight: bold;
-    line-height: 25px;
-}
