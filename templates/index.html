@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container">
+  <hr>
+  <h2>Small Blog</h2>
+  <hr>
+  <div id="blog-post-single" class="modal hide fade">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3>First Post</h3>
+    </div>
+    <div class="modal-body">
+      <p class="post-body">
+      </p>
+      <p class="post-comments">
+      </p>
+    </div>
+    <div class="modal-footer">
+    </div>
+  </div>
+  <div id="canvas">
+    <div class="blog-post">
+      <div class="title">First Post</div>
+      <div class="post">
+        LOL
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script type="text/javascript">
+  function getUserObj(api){
+    var userObj;
+    $.ajax({
+      'type' : 'get',
+      'url' : api,
+      'dataType' : 'json',
+      'async' : false,
+      'success' : function(user){
+        userObj = user
+      }
+    })
+    return userObj
+  }
+
+  function loadBlogPost(){
+    postId = parseInt($(this).attr('id'));
+    console.log("Fetiching post #" + postId.toString());
+    $.ajax({
+      'type': 'get',
+      'url' : '/api/v1/post/' + postId.toString() + '/?format=json',
+      'dataType' : 'json',
+      'success' : function (postObj) {
+        $("#blog-post-single .modal-header h3").html(postObj.title);
+        $("#blog-post-single .modal-body .post-body").html(postObj.body);
+        $("#blog-post-single").modal();
+        console.log("Fetiching post #" + postId.toString() + ' complete.');
+      }
+    })
+  }
+
+  function loadBlogs(baseAPI) {
+    $("#canvas").html("Loading...")
+    console.log('Fetching blog posts...')
+    $.ajax({
+      'type' : 'get',
+      'url' : baseAPI,
+      'dataType' : 'json',
+      'success' : function (resObj) {
+        $("#canvas").html("")
+        for(var i = 0; i < resObj.meta.limit && i < resObj.meta.total_count; i++){
+          $("#canvas").append('<div class="blog-post"><div class="title" id="' + resObj.objects[i].id + '">' + resObj.objects[i].title + '<span class="label pull-right">' + resObj.objects[i].date + '</span></div><div class="post">' + '<span class="label label-info pull-right">by ' + getUserObj(resObj.objects[i].user).username + '</span></div><div class="post">' + resObj.objects[i].body + '</div></div>');
+          $("#canvas").append('<hr>');
+        }
+        console.log('Fetching blog posts completed.');
+        $('.blog-post .title').click(loadBlogPost);
+      },
+      'error' : function(xhr, textStatus, errorThrown){
+        if(xhr.status > 400 && xhr.status < 500){
+          $("#canvas").html('There is something wrong with the API. Ask <a href="#" onclick="loadBlogs(\'/api/v1/post/?format=json\')">BOB</a> to fix it.')
+          console.log('Fetching blog posts returned error ' + xhr.status)
+        }
+        else if(xhr.status > 500 && xhr.status < 600){
+          $("#canvas").html('Sorry, our servers are not working. Ask <a href="#">ROB</a> to fix it.')
+        }
+      }
+    })
+  }
+  $(document).ready(loadBlogs('/api/v1/post/?format=json'));
+</script>
+{% endblock %}
