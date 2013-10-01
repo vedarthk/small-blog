@@ -5,6 +5,14 @@
   <hr>
   <h2>Small Blog</h2>
   <hr>
+  {% if user %}
+    <a href="#post-new" data-toggle="modal">New Post</a>&nbsp;|
+    <a href="{% url 'views.user_logout' %}">Logout</a>
+  {% else %}
+    <a href="#user-login" data-toggle="modal">Login</a>
+  {% endif %}
+  <hr>
+
   <div id="blog-post-single" class="modal hide fade">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -19,13 +27,45 @@
     <div class="modal-footer">
     </div>
   </div>
-  <div id="canvas">
-    <div class="blog-post">
-      <div class="title">First Post</div>
-      <div class="post">
-        LOL
-      </div>
+
+  <div id="user-login" class="modal hide fade">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3>Login</h3>
     </div>
+    <div class="modal-body">
+      <form class="form" method="post" action="{% url 'views.user_login' %}">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="username">
+        <input type="password" name="password" placeholder="password">
+        <input type="submit" value="Login" class="btn btn-success">
+      </form>
+    </div>
+    <div class="modal-footer">
+    </div>
+  </div>
+
+  <div id="post-new" class="modal hide fade">
+    
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3>New Post</h3>
+    </div>
+    <div class="modal-body">
+        <form class="form" method="post" action="{% url 'views.post_new' %}">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="title for your blog post" class="span5">
+        <textarea name="body" class="span5" rows="10" placeholder="Start typing your blog post here..."></textarea>
+    </div>
+    <div class="modal-footer">
+        <input type="submit" value="Save" class="btn btn-success" style="margin: 0">
+      </form>
+    </div>
+    
+  </div>
+
+
+  <div id="canvas">
   </div>
 </div>
 {% endblock %}
@@ -48,6 +88,7 @@
   }
 
   function loadBlogPost(){
+    console.log(window.location)
     postId = parseInt($(this).attr('id'));
     console.log("Fetiching post #" + postId.toString());
     $.ajax({
@@ -57,6 +98,7 @@
       'success' : function (postObj) {
         $("#blog-post-single .modal-header h3").html(postObj.title);
         $("#blog-post-single .modal-body .post-body").html(postObj.body);
+        window.location.hash = "#!/post/" + postObj.slug;
         $("#blog-post-single").modal();
         console.log("Fetiching post #" + postId.toString() + ' complete.');
       }
@@ -78,6 +120,7 @@
         }
         console.log('Fetching blog posts completed.');
         $('.blog-post .title').click(loadBlogPost);
+        $('#blog-post-single').on('hidden', function(){window.location.hash = ""})
       },
       'error' : function(xhr, textStatus, errorThrown){
         if(xhr.status > 400 && xhr.status < 500){
@@ -90,6 +133,16 @@
       }
     })
   }
-  $(document).ready(loadBlogs('/api/v1/post/?format=json'));
+
+  $(document).ready(function(){
+    loadBlogs('/api/v1/post/?format=json');
+    {% if user_authentication_failed %}
+    $("body").append('<div class="alert alert-error fade in"><a class="close pull-right" data-dismiss="alert" href="#">&times;</a>Incorrect username or password</div>');
+    {% endif %}
+    {% if user %}
+    $("body").append('<div class="alert alert-success fade in"><a class="close pull-right" data-dismiss="alert" href="#">&times;</a>You have successfully logged in.</div>');
+    {% endif %}
+    $(".alert").alert()
+  });
 </script>
 {% endblock %}

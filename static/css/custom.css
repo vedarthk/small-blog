@@ -7,3 +7,18 @@
 .blog-post .title:hover {
     cursor: pointer;
 }
+
+.alert{
+    position: absolute; 
+    top: 0;
+    right: 0;
+    text-align: center;
+}
+
+input[type=text], input[type=password] {
+    padding: 1em 1em 1em 1em;
+}
+
+.btn {
+    margin-top: -2%;
+}

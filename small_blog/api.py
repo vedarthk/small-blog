@@ -33,4 +33,5 @@ class PostResource(ModelResource):
     def dehydrate(self, bundle):
         bundle.data['request_ip'] = bundle.request.META.get('REMOTE_ADDR')
         bundle.data['date'] = bundle.data['pub_date'].strftime("%x")
+        bundle.data['body'] = bundle.data['body'].replace('\n', '<br>')
         return bundle

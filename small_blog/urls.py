@@ -13,6 +13,9 @@ v1_api.register(UserResource())
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'small_blog.views.home', name='home'),
+    url(r'^login[/]?$', 'small_blog.views.user_login', name='user_login'),
+    url(r'^logout[/]?$', 'small_blog.views.user_logout', name='user_logout'),
+    url(r'^post/new[/]?$', 'small_blog.views.post_new', name='user_logout'),
     # url(r'^small_blog/', include('small_blog.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
