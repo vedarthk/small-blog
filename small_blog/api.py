@@ -3,13 +3,15 @@ from tastypie import fields
 from tastypie.constants import ALL
 from tastypie.authorization import DjangoAuthorization
 from tastypie.throttle import BaseThrottle
-from tastypie.resources import ModelResource
+from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
 from django.template.defaultfilters import slugify
 from tastypie.serializers import Serializer
 
 from small_blog.models import Post, Comment
 
 class UserResource(ModelResource):
+    comment = fields.ToManyField('small_blog.api.CommentResource', 'comment', null = True, blank = True, full = True)
+    post = fields.ToManyField('small_blog.api.PostResource', 'post', null = True, blank = True, full = True)
     class Meta:
         queryset = User.objects.all()
         resource_name = 'user'
@@ -17,13 +19,16 @@ class UserResource(ModelResource):
         allowed_methods = ['get']
 
 class PostResource(ModelResource):
-    user = fields.ToOneField(UserResource, 'user')
+    user = fields.ForeignKey(UserResource, 'user')
+    comment = fields.ToManyField('small_blog.api.CommentResource', 'comment', null = True, blank = True, full = True)
     class Meta:
         queryset = Post.objects.all()
         resource_name = 'post'
         authorization = DjangoAuthorization()
         filtering = {
+            "comment":ALL,
             "slug" : ('exact', 'startswith',),
+            
             "title" : ALL,
         }
     
@@ -57,9 +62,25 @@ class CommentResource(ModelResource):
     post = fields.ToOneField(PostResource, 'post')
 
     class Meta:
+        ordering = ['pub_date']
         queryset = Comment.objects.all()
         resource_name = 'comment'
         authorization = DjangoAuthorization()
         filtering = {
-            'post' : ALL
+            'post' : ALL_WITH_RELATIONS
         }
+
+    def hydrate_user(self, bundle):
+        bundle.data['user'] = bundle.request.user
+        return bundle
+
+    def hydrate_post(sefl, bundle):
+        bundle.data['post'] = Post.objects.get(id = int(bundle.data['post']))
+        return bundle
+
+    def dehydrate(self, bundle):
+        if bundle.request.user.is_authenticated() and bundle.request.user.id == bundle.obj.user.id:
+            bundle.data['delete'] = True
+        else:
+            bundle.data['delete'] =  False
+        return bundle

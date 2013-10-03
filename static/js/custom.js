@@ -68,6 +68,30 @@
   }
 
   //
+  // Function to load comments for a post
+  //
+  function loadComments(post){
+    console.log("Fetching comments for " + post)
+    $.ajax({
+      'url' : post,
+      'dataType' : 'json',
+      'type' : 'get'
+    }).done(function (postObj){
+      if(postObj.comment.length > 0){
+        var comments = "<hr><h4>Comments</h4>";
+        for(var i = 0; i < postObj.comment.length; i++){
+          comments += '<div class="well">';
+          if(postObj.comment[i].delete){
+            comments += '<a class="pull-right" href="#"><i class="icon-trash"></i></a>';
+          }
+          comments += '<small>by ' + getUserObj(postObj.comment[i].user).username + '</small><p>' + postObj.comment[i].comment + '</p>';
+          comments += '</div>'
+        }
+        $("#blog-post-single .modal-body .post-comments").html(comments);
+      }
+    })
+  }
+  //
   // Function to load a single blog post
   //
   function loadBlogPost(){
@@ -81,7 +105,15 @@
       'success' : function (postObj) {
         $("#blog-post-single .modal-header h3").html(postObj.title);
         $("#blog-post-single .modal-body .post-body").html(postObj.body);
+        $("#blog-post-single .modal-body .post-comments").html("");
+        var commentForm = $("form#comment-new");
+        if(commentForm){
+          commentForm.append('<input type="hidden" name="post" value="' + postObj.id + '">')
+          commentForm.append('<input type="hidden" name="post_resource_uri" value="' + postObj.resource_uri + '">')
+        }
+        loadComments(postObj.resource_uri);
         window.location.hash = "#!/post/" + postObj.slug;
+        console.log(postObj.comment)
         $("#blog-post-single").modal();
         console.log("Fetiching post #" + postId.toString() + ' complete.');
       }
@@ -107,6 +139,9 @@
           blogPost += '<div class="post">';
           if (resObj.objects[i].delete){
             blogPost += '&nbsp;<a class="delete-post pull-right" data-uri="' + resObj.objects[i].resource_uri + '" href="#!' + resObj.objects[i].resource_uri + '"><i class="icon-trash"></i></a>'
+          }
+          if(resObj.objects[i].comment.length > 0){
+            blogPost += '<span class="label label-warning pull-right">' + resObj.objects[i].comment.length + ' comment(s)</span>';
           }
           blogPost += '<span class="label label-info pull-right">by ' + getUserObj(resObj.objects[i].user).username + '</span></div>';
           blogPost += '<div class="post">' + resObj.objects[i].body + '</div></div>';
@@ -144,5 +179,22 @@
       $("body").append('<div class="alert alert-success fade in"><a class="close pull-right" data-dismiss="alert" href="#">&times;</a>New blog post created.</div>');
         loadBlogs();
         $("div#post-new").modal('toggle')
+    })
+  }
+
+  function createComment(event){
+    event.preventDefault();
+    var form = this;
+    var json = convertFormToJson(form)
+    console.log(json)
+    $.ajax({
+      'type' : 'post',
+      'contentType' : 'application/json',
+      'url' : API['comment'],
+      'data' : JSON.stringify(json),
+      'processData' : false,
+    }).done(function (res){
+      loadComments(json.post_resource_uri);
+      $("form#comment-new").each(function (){this.reset()});
     })
   }

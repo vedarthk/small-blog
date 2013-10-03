@@ -4,7 +4,7 @@ from django.db import models
 from django.template.defaultfilters import slugify
 
 class Post(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, related_name = 'post')
     pub_date = models.DateTimeField(default = now)
     title = models.CharField(max_length = 200)
     slug = models.SlugField()
@@ -19,10 +19,13 @@ class Post(models.Model):
         return super(Post, self).save(*args, **kwargs)
 
 class Comment(models.Model):
-    user = models.ForeignKey(User)
-    post = models.ForeignKey(Post)
+    user = models.ForeignKey(User, related_name = 'comment')
+    post = models.ForeignKey(Post, related_name='comment')
     pub_date = models.DateTimeField(default = now)
     comment = models.TextField()
+
+    class Meta:
+        ordering = ['-pub_date', ]
 
     def __unicode__(self):
         return self.comment

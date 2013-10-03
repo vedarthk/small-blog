@@ -22,6 +22,18 @@
     <div class="modal-body">
       <p class="post-body">
       </p>
+      {% if user %}
+      <p class="post-write-comment">
+        <hr>
+        <h5>Write a comment</h5>
+        <form id="comment-new" class="form" method="post" action="{% url 'views.post_new' %}">
+          {% csrf_token %}
+          <label>Comment :</label>
+          <textarea name="comment" class="span5" rows="2" placeholder="Start typing your comment here..."></textarea>
+          <input type="submit" value="Comment" class="btn btn-success" style="margin: 0">
+        </form>
+      </p>
+      {% endif %}
       <p class="post-comments">
       </p>
     </div>
@@ -91,6 +103,7 @@ $(document).ready(function(){
 
     // Binf createBlogPost() function to form submit
     $("form#post-new").bind('submit', createBlogPost);
+    $("form#comment-new").bind('submit', createComment);
 
     // Display messages from Django if there are any
     {% if messages %}
