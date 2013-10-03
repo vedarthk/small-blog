@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
 from tastypie.api import Api
-from small_blog.api import PostResource, UserResource
+from small_blog.api import PostResource, UserResource, CommentResource
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -9,6 +9,7 @@ admin.autodiscover()
 v1_api = Api(api_name = 'v1')
 v1_api.register(PostResource())
 v1_api.register(UserResource())
+v1_api.register(CommentResource())
 
 urlpatterns = patterns('',
     # Examples:

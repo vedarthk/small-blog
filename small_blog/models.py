@@ -17,3 +17,12 @@ class Post(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)[:50]
         return super(Post, self).save(*args, **kwargs)
+
+class Comment(models.Model):
+    user = models.ForeignKey(User)
+    post = models.ForeignKey(Post)
+    pub_date = models.DateTimeField(default = now)
+    comment = models.TextField()
+
+    def __unicode__(self):
+        return self.comment
