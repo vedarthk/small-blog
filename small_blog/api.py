@@ -37,7 +37,7 @@ class PostResource(ModelResource):
         bundle.data['request_ip'] = bundle.request.META.get('REMOTE_ADDR')
         bundle.data['date'] = bundle.data['pub_date'].strftime("%x")
 
-        if bundle.request.user.is_authenticated():
+        if bundle.request.user.is_authenticated() and bundle.request.user.id == bundle.obj.user.id:
             bundle.data['delete'] = True
         else:
             bundle.data['delete'] =  False
