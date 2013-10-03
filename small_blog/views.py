@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 
 def home(request):
     response_dict = {}
@@ -21,11 +22,14 @@ def user_login(request):
     if user is not None:
         if user.is_active:
             login(request, user)
+            messages.success(request, "Logged in successfully.")
             return redirect('home')
         else:
+            messages.error(request, "User is not active.")
             return redirect('home')
             print user, " is not active."
     else:
+        messages.error(request, "Username or password is incorrect.")
         return redirect('/?user_authentication_failed=1')
         print "User not in database."
 

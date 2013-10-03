@@ -3,7 +3,7 @@
 {% block body %}
 <div class="container">
   <hr>
-  <h2>Small Blog</h2>
+  <h2>Small Blog<a href="#" onclick="loadBlogs()" title="Refresh"><i class="icon-repeat"></i></a></h2>
   <hr>
   {% if user %}
     <a href="#post-new" data-toggle="modal">New Post</a>&nbsp;|
@@ -16,7 +16,7 @@
   <div id="blog-post-single" class="modal hide fade">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <h3>First Post</h3>
+      <h3></h3>
     </div>
     <div class="modal-body">
       <p class="post-body">
@@ -52,14 +52,15 @@
       <h3>New Post</h3>
     </div>
     <div class="modal-body">
-        <form class="form" method="post" action="{% url 'views.post_new' %}">
+      <form id="post-new" class="form" method="post" action="{% url 'views.post_new' %}">
         {% csrf_token %}
         <input type="text" name="title" placeholder="title for your blog post" class="span5">
-        <textarea name="body" class="span5" rows="10" placeholder="Start typing your blog post here..."></textarea>
+        <textarea name="post" class="span5" rows="10" placeholder="Start typing your blog post here..."></textarea>
+      
     </div>
     <div class="modal-footer">
         <input type="submit" value="Save" class="btn btn-success" style="margin: 0">
-      </form>
+        </form>
     </div>
     
   </div>
@@ -73,6 +74,42 @@
 
 {% block extra_js %}
 <script type="text/javascript">
+  //
+  // Fucntion to delete blog post
+  //
+  function deleteBlogPost(){
+    if(confirm("Should I delete this post ?")){
+      $.ajax({
+        'url' : $(this).attr('data-uri'),
+        'type' : 'delete',
+        'dataType' : 'json',
+        'success' : function (resObj) {
+          $("body").append('<div class="alert alert-success fade in"><a class="close pull-right" data-dismiss="alert" href="#">&times;</a>Blog post deleted.</div>');
+          window.location.hash = ""
+          loadBlogs()
+        }
+      })
+    }
+    else{
+      window.location.hash = ""
+    }
+  }
+
+  //
+  // Function to convert HTML form data to JSON object
+  //
+  function convertFormToJson(form){
+    var array = $(form).serializeArray();
+    var json = {};
+    $.each(array, function() {
+      json[this.name] = this.value || '';
+    });
+    return json;
+  }
+
+  //
+  // Function to get User object from the API URI
+  //
   function getUserObj(api){
     var userObj;
     $.ajax({
@@ -87,6 +124,9 @@
     return userObj
   }
 
+  //
+  // Function to load a single blog post
+  //
   function loadBlogPost(){
     console.log(window.location)
     postId = parseInt($(this).attr('id'));
@@ -105,7 +145,12 @@
     })
   }
 
+  //
+  // Fucntion to load all the blog posts on the home page
+  //
   function loadBlogs(baseAPI) {
+    baseAPI = '/api/v1/post/';
+  
     $("#canvas").html("Loading...")
     console.log('Fetching blog posts...')
     $.ajax({
@@ -115,11 +160,19 @@
       'success' : function (resObj) {
         $("#canvas").html("")
         for(var i = 0; i < resObj.meta.limit && i < resObj.meta.total_count; i++){
-          $("#canvas").append('<div class="blog-post"><div class="title" id="' + resObj.objects[i].id + '">' + resObj.objects[i].title + '<span class="label pull-right">' + resObj.objects[i].date + '</span></div><div class="post">' + '<span class="label label-info pull-right">by ' + getUserObj(resObj.objects[i].user).username + '</span></div><div class="post">' + resObj.objects[i].body + '</div></div>');
-          $("#canvas").append('<hr>');
+          var blogPost = '<div class="blog-post">';
+          blogPost += '<div class="title" id="' + resObj.objects[i].id + '">' + resObj.objects[i].title + '<span class="label pull-right">' + resObj.objects[i].date + '</span></div>';
+          blogPost += '<div class="post">';
+          if (resObj.objects[i].delete){
+            blogPost += '&nbsp;<a class="delete-post pull-right" data-uri="' + resObj.objects[i].uri + '" href="#!' + resObj.objects[i].uri + '"><i class="icon-trash"></i></a>'
+          }
+          blogPost += '<span class="label label-info pull-right">by ' + getUserObj(resObj.objects[i].user).username + '</span></div>';
+          blogPost += '<div class="post">' + resObj.objects[i].body + '</div></div>';
+          $("#canvas").append(blogPost + '<hr>');
         }
         console.log('Fetching blog posts completed.');
         $('.blog-post .title').click(loadBlogPost);
+        $('.blog-post .delete-post').click(deleteBlogPost);
         $('#blog-post-single').on('hidden', function(){window.location.hash = ""})
       },
       'error' : function(xhr, textStatus, errorThrown){
@@ -134,13 +187,33 @@
     })
   }
 
+  function createBlogPost(event){
+    event.preventDefault();
+    var form = this;
+    var json = convertFormToJson(form)
+    console.log(JSON.stringify(json))
+    $.ajax({
+      'type' : 'post',
+      'contentType' :'application/json',
+      'url' : '/api/v1/post/',
+      'data' : JSON.stringify(json),
+      'processData' : false
+    }).done(function (){
+      $("body").append('<div class="alert alert-success fade in"><a class="close pull-right" data-dismiss="alert" href="#">&times;</a>New blog post created.</div>');
+        loadBlogs();
+        $("div#post-new").modal('toggle')
+    })
+  }
+
   $(document).ready(function(){
-    loadBlogs('/api/v1/post/?format=json');
-    {% if user_authentication_failed %}
-    $("body").append('<div class="alert alert-error fade in"><a class="close pull-right" data-dismiss="alert" href="#">&times;</a>Incorrect username or password</div>');
-    {% endif %}
-    {% if user %}
-    $("body").append('<div class="alert alert-success fade in"><a class="close pull-right" data-dismiss="alert" href="#">&times;</a>You have successfully logged in.</div>');
+    loadBlogs();
+
+    $("form#post-new").bind('submit', createBlogPost);
+    
+    {% if messages %}
+      {% for message in messages %}
+        $("body").append('<div class="alert alert-success fade in"><a class="close pull-right" data-dismiss="alert" href="#">&times;</a>{{ message }}</div>');    
+      {% endfor %}
     {% endif %}
     $(".alert").alert()
   });
