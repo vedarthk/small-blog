@@ -39,6 +39,27 @@
   }
 
   //
+  // Fucntion to delete blog post comment
+  //
+  function deleteBlogPostComment(){
+    var post = $(this).attr('data-post-uri');
+    if(confirm("Should I delete this comment ?")){
+      console.log("Deleting " + $(this).attr('data-uri'))
+      $.ajax({
+        'url' : $(this).attr('data-uri'),
+        'type' : 'delete',
+      }).done(function (res){
+        console.log("Fetching comments for " + post)
+        loadBlogs()
+        loadComments(post)
+      })
+    }
+    else{
+      window.location.hash = ""
+    }
+  }
+
+  //
   // Function to convert HTML form data to JSON object
   //
   function convertFormToJson(form){
@@ -82,12 +103,13 @@
         for(var i = 0; i < postObj.comment.length; i++){
           comments += '<div class="well">';
           if(postObj.comment[i].delete){
-            comments += '<a class="pull-right" href="#"><i class="icon-trash"></i></a>';
+            comments += '<a class="pull-right delete-comment" data-uri="' + postObj.comment[i].resource_uri + '" data-post-uri="' + postObj.resource_uri + '" href="#"><i class="icon-trash"></i></a>';
           }
           comments += '<small>by ' + getUserObj(postObj.comment[i].user).username + '</small><p>' + postObj.comment[i].comment + '</p>';
           comments += '</div>'
         }
         $("#blog-post-single .modal-body .post-comments").html(comments);
+        $('a.delete-comment').click(deleteBlogPostComment);
       }
     })
   }
@@ -194,6 +216,7 @@
       'data' : JSON.stringify(json),
       'processData' : false,
     }).done(function (res){
+      loadBlogs()
       loadComments(json.post_resource_uri);
       $("form#comment-new").each(function (){this.reset()});
     })
