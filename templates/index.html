@@ -3,7 +3,7 @@
 {% block body %}
 <div class="container">
   <hr>
-  <h2 style="text-align: right; letter-spacing: 2px;">Small Blog<a href="#" onclick="loadBlogs()" title="Refresh"><i class="icon-repeat"></i></a></h2>
+  <h2 style="text-align: right; letter-spacing: 2px;">Small Blog<a href="#" onclick="loadBlogs()" title="Refresh"><i class="glyphicon glyphicon-flash"></i></a></h2>
   <hr>
   {% if user %}
     <a href="#post-new" data-toggle="modal">New Post</a>&nbsp;|
@@ -14,50 +14,58 @@
   <hr>
 
   <!-- Div to display single blog post -->
-  <div id="blog-post-single" class="modal hide fade">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <h3></h3>
-    </div>
-    <div class="modal-body">
-      <p class="post-body">
-      </p>
-      {% if user %}
-      <p class="post-write-comment">
-        <hr>
-        <h5>Write a comment</h5>
-        <form id="comment-new" class="form" method="post" action="{% url 'views.post_new' %}">
-          {% csrf_token %}
-          <label>Comment :</label>
-          <textarea name="comment" class="span5" rows="2" placeholder="Start typing your comment here..."></textarea>
-          <input type="submit" value="Comment" class="btn btn-success" style="margin: 0">
-        </form>
-      </p>
-      {% endif %}
-      <p class="post-comments">
-      </p>
-    </div>
-    <div class="modal-footer">
+  <div id="blog-post-single" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h3></h3>
+        </div>
+        <div class="modal-body">
+          <p class="post-body">
+          </p>
+          {% if user %}
+          <p class="post-write-comment">
+            <hr>
+            <h5>Write a comment</h5>
+            <form id="comment-new" class="form" method="post" action="{% url 'views.post_new' %}">
+              {% csrf_token %}
+              <label>Comment :</label>
+              <textarea name="comment" class="form-control" rows="2" placeholder="Start typing your comment here..."></textarea>
+              <input type="submit" value="Comment" class="btn btn-success" style="margin: 0">
+            </form>
+          </p>
+          {% endif %}
+          <p class="post-comments">
+          </p>
+        </div>
+        <div class="modal-footer">
+        </div>
+      </div>
     </div>
   </div>
   <!-- Div for single blog post ends here -->
 
   {% if not user %}
   <!-- User login form div -->
-  <div id="user-login" class="modal hide fade">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <h3>Login</h3>
-    </div>
-    <div class="modal-body">
-      <form class="form" method="post" action="{% url 'views.user_login' %}">
-        {% csrf_token %}
-        <input type="text" name="username" placeholder="username">
-        <input type="password" name="password" placeholder="password">
-        <input type="submit" value="Login" class="btn btn-success">
-      </form>
-    </div>
-    <div class="modal-footer">
+  <div id="user-login" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h3>Login</h3>
+        </div>
+        <div class="modal-body">
+          <form class="form" method="post" action="{% url 'views.user_login' %}">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="username">
+            <input type="password" name="password" placeholder="password">
+            <input type="submit" value="Login" class="btn btn-success">
+          </form>
+        </div>
+        <div class="modal-footer">
+        </div>
+      </div>
     </div>
   </div>
   <!-- User login form div ends here -->
@@ -66,19 +74,23 @@
   {% if user %}
   <!-- Create new blog post form div -->
   <div id="post-new" class="modal hide fade">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <h3>New Post</h3>
-    </div>
-    <div class="modal-body">
-      <form id="post-new" class="form" method="post" action="{% url 'views.post_new' %}">
-        {% csrf_token %}
-        <input type="text" name="title" placeholder="title for your blog post" class="span5">
-        <textarea name="post" class="span5" rows="10" placeholder="Start typing your blog post here..."></textarea>
-    </div>
-    <div class="modal-footer">
-        <input type="submit" value="Save" class="btn btn-success" style="margin: 0">
-        </form>
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h3>New Post</h3>
+        </div>
+        <div class="modal-body">
+          <form id="post-new" class="form" method="post" action="{% url 'views.post_new' %}">
+            {% csrf_token %}
+            <input type="text" name="title" placeholder="title for your blog post" class="span5">
+            <textarea name="post" class="span5" rows="10" placeholder="Start typing your blog post here..."></textarea>
+        </div>
+        <div class="modal-footer">
+            <input type="submit" value="Save" class="btn btn-success" style="margin: 0">
+            </form>
+        </div>
+      </div>
     </div>
   </div>
   <!-- Create blog post div ends here -->

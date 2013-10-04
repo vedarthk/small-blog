@@ -14,6 +14,7 @@ v1_api.register(CommentResource())
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'small_blog.views.home', name='home'),
+    url(r'^back$', 'small_blog.views.backbone_test', name='backbone_test'),
     url(r'^login[/]?$', 'small_blog.views.user_login', name='user_login'),
     url(r'^logout[/]?$', 'small_blog.views.user_logout', name='user_logout'),
     url(r'^post/new[/]?$', 'small_blog.views.post_new', name='user_logout'),

@@ -22,6 +22,8 @@ class PostResource(ModelResource):
     user = fields.ForeignKey(UserResource, 'user')
     comment = fields.ToManyField('small_blog.api.CommentResource', 'comment', null = True, blank = True, full = True)
     class Meta:
+        always_return_data = True
+        allowed_methods = ['get', 'post', 'delete', 'put']
         queryset = Post.objects.all()
         resource_name = 'post'
         authorization = DjangoAuthorization()
@@ -55,6 +57,9 @@ class PostResource(ModelResource):
     def hydrate_body(self, bundle):
         bundle.data['body'] = bundle.data['post']
         return bundle
+
+    def alter_list_data_to_serialize(self, request, data):
+        return data
 
 
 class CommentResource(ModelResource):

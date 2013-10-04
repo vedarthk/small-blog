@@ -103,7 +103,7 @@
         for(var i = 0; i < postObj.comment.length; i++){
           comments += '<div class="well">';
           if(postObj.comment[i].delete){
-            comments += '<a class="pull-right delete-comment" data-uri="' + postObj.comment[i].resource_uri + '" data-post-uri="' + postObj.resource_uri + '" href="#"><i class="icon-trash"></i></a>';
+            comments += '<a class="pull-right delete-comment" data-uri="' + postObj.comment[i].resource_uri + '" data-post-uri="' + postObj.resource_uri + '" href="#"><i class="glyphicon glyphicon-trash"></i></a>';
           }
           comments += '<small>by ' + getUserObj(postObj.comment[i].user).username + '</small><p>' + postObj.comment[i].comment + '</p>';
           comments += '</div>'
@@ -157,10 +157,10 @@
         $("#canvas").html("")
         for(var i = 0; i < resObj.meta.limit && i < resObj.meta.total_count; i++){
           var blogPost = '<div class="blog-post">';
-          blogPost += '<div class="title" id="' + resObj.objects[i].id + '">' + resObj.objects[i].title + '<span class="label pull-right">' + resObj.objects[i].date + '</span></div>';
+          blogPost += '<div class="title" id="' + resObj.objects[i].id + '">' + resObj.objects[i].title + '<span class="badge pull-right">' + resObj.objects[i].date + '</span></div>';
           blogPost += '<div class="post">';
           if (resObj.objects[i].delete){
-            blogPost += '&nbsp;<a class="delete-post pull-right" data-uri="' + resObj.objects[i].resource_uri + '" href="#!' + resObj.objects[i].resource_uri + '"><i class="icon-trash"></i></a>'
+            blogPost += '&nbsp;<a class="delete-post pull-right" data-uri="' + resObj.objects[i].resource_uri + '" href="#!' + resObj.objects[i].resource_uri + '"><i class="glyphicon glyphicon-trash"></i></a>'
           }
           if(resObj.objects[i].comment.length > 0){
             blogPost += '<span class="label label-warning pull-right">' + resObj.objects[i].comment.length + ' comment(s)</span>';

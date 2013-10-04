@@ -37,6 +37,8 @@ def user_logout(request):
     logout(request)
     return redirect('home')
 
+def backbone_test(request):
+    return render_to_response('backbone-test.html', {}, context_instance = RequestContext(request))
 
 def post_new(request):
     return HttpResponse()
