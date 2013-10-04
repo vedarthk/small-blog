@@ -27,6 +27,7 @@ class PostResource(ModelResource):
         queryset = Post.objects.all()
         resource_name = 'post'
         authorization = DjangoAuthorization()
+        fields = ['title', 'body']
         filtering = {
             "comment":ALL,
             "slug" : ('exact', 'startswith',),
@@ -41,8 +42,8 @@ class PostResource(ModelResource):
         return bundle.data['body'].replace('\n', '<br>')
 
     def dehydrate(self, bundle):
-        bundle.data['request_ip'] = bundle.request.META.get('REMOTE_ADDR')
-        bundle.data['date'] = bundle.data['pub_date'].strftime("%x")
+        #bundle.data['request_ip'] = bundle.request.META.get('REMOTE_ADDR')
+        #bundle.data['date'] = bundle.data['pub_date'].strftime("%x")
 
         if bundle.request.user.is_authenticated() and bundle.request.user.id == bundle.obj.user.id:
             bundle.data['delete'] = True
@@ -59,7 +60,7 @@ class PostResource(ModelResource):
         return bundle
 
     def alter_list_data_to_serialize(self, request, data):
-        return data
+        return data['objects']
 
 
 class CommentResource(ModelResource):
