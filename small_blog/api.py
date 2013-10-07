@@ -46,9 +46,9 @@ class PostResource(ModelResource):
         #bundle.data['date'] = bundle.data['pub_date'].strftime("%x")
 
         if bundle.request.user.is_authenticated() and bundle.request.user.id == bundle.obj.user.id:
-            bundle.data['delete'] = True
+            bundle.data['delete_flag'] = True
         else:
-            bundle.data['delete'] =  False
+            bundle.data['delete_flag'] =  False
         return bundle
 
     def hydrate_user(self, bundle):

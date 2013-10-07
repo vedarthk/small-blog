@@ -102,32 +102,26 @@
 
   <!-- Canvas div where all blog posts are displayed -->
   <div id="canvas">
+    <div id="blog">
+
+    </div>
   </div>
   <!-- End of Canvas div -->
 </div>
 {% endblock %}
 
-
 {% block extra_js %}
-<script type="text/javascript" src="{{STATIC_URL}}js/custom.js"></script>
-<script type="text/javascript">
-$(document).ready(function(){
-    // Load API URIs
-    loadApiUris()
-    // Load blog posts fro API
-    loadBlogs();
-
-    // Binf createBlogPost() function to form submit
-    $("form#post-new").bind('submit', createBlogPost);
-    $("form#comment-new").bind('submit', createComment);
-
-    // Display messages from Django if there are any
-    {% if messages %}
-      {% for message in messages %}
-        $("body").append('<div class="alert alert-success fade in"><a class="close pull-right" data-dismiss="alert" href="#">&times;</a>{{ message }}</div>');    
-      {% endfor %}
-    {% endif %}
-    $(".alert").alert()
-  });
+<script type="text/template" id="blog-post-template">
+  <div class="blog-post">
+    <div class="title"><%- title %></div>
+    <div class="post">
+      <% if(delete_flag) { %>
+        &nbsp;<a class="delete-post pull-right" data-uri="<%- resource_uri %>" href="#!<%- resource_uri %>"><i class="glyphicon glyphicon-trash"></i></a>
+      <% } %>
+      <%- body %>
+    </div>
+  </div>
+  <hr>
 </script>
+<script type="text/javascript" src="{{STATIC_URL}}js/app.js"></script>
 {% endblock %}
